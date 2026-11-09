@@ -1,0 +1,528 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>369 Manifestation Method â€” Sacred Daily Alignment</title>
+  <meta name="description" content="Nikola Tesla 369 manifestation daily ritual with custom alarms, life aspect templates, and 33-day streak tracker. Pin like an APK to your Android phone." />
+
+  <!-- PWA Manifest & Android Web App Settings -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#070a14" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="369 Method" />
+
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon-369.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/manifest-369.css" />
+</head>
+<body>
+
+  <!-- Dynamic Cosmic Canvas & Glowing Atmosphere -->
+  <canvas id="spaceCanvas"></canvas>
+  <div class="cosmic-nebula"></div>
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Top 33-Day Sacred Progress Bar -->
+  <div class="top-milestone-bar">
+    <div class="top-milestone-fill" id="topMilestoneFill"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="cosmos-toast" id="cosmosToast">âœ¨ Manifestation active</div>
+
+  <!-- Main Viewport Container -->
+  <div class="app-container">
+
+    <!-- ========================================================
+         VIEW 1: TODAY (Exact layout from user reference image)
+         ======================================================== -->
+    <div class="tab-view active" id="view_today">
+      
+      <!-- Top App Header -->
+      <header class="app-header">
+        <div class="streak-row">
+          <span class="streak-flame">ðŸ”¥</span>
+          <span id="streakCounterText">0 day streak</span>
+        </div>
+        <div class="header-status-title" id="headerStatusTitle">Today is a fresh page.</div>
+        <div class="free-days-badge">
+          <span>Sacred 369</span> Â· Unlimited &amp; Free Forever
+        </div>
+
+        <div class="star-divider">
+          <span>âœ¦</span>
+        </div>
+      </header>
+
+      <!-- PWA Android Install Banner (Shown on phone browsers) -->
+      <div class="pwa-install-banner" id="pwaInstallBanner">
+        <div class="pwa-banner-left">
+          <div class="pwa-banner-icon">ðŸ“±</div>
+          <div class="pwa-banner-text">
+            <h4>Pin to Android Phone</h4>
+            <p>Use everyday like an APK with offline alarms</p>
+          </div>
+        </div>
+        <button class="btn-install-pwa" onclick="Cosmos369.promptInstallPWA()">Install App</button>
+      </div>
+
+      <!-- Active Affirmation Quote Box (Serif Hero Display) -->
+      <div class="active-quote-box">
+        <div class="quote-category-tag" id="activeAffirmationCategory">âœ¦ Self Care</div>
+        <div class="active-quote-text" id="activeAffirmationText">
+          â€œI am grounded, present, and enough, exactly as I am.â€
+        </div>
+        <div class="quote-actions-row">
+          <button class="btn-quote-action" onclick="Cosmos369.switchTab('templates')">
+            <span>ðŸ“œ</span> Change Affirmation
+          </button>
+          <button class="btn-quote-action" onclick="Cosmos369.editAndUseTemplate(document.getElementById('activeAffirmationText').textContent.replace(/[â€œâ€]/g, ''), 'Custom')">
+            <span>âœŽ</span> Edit Sentence
+          </button>
+        </div>
+      </div>
+
+      <!-- The 3 Daily Sessions (Three, Six, Nine) -->
+      <div class="sessions-list">
+
+        <!-- SESSION 1: THREE (Morning - Write 3 times) -->
+        <div class="session-card is-active" id="sessionCard_three">
+          <div class="session-card-left">
+            <div class="number-circle">3</div>
+            <div class="session-info">
+              <div class="session-name">Three</div>
+              <div class="session-status">Open now</div>
+            </div>
+          </div>
+          <div class="session-action">
+            <button class="btn-write-gold" onclick="Cosmos369.openWritingModal('morning', 3)">Write</button>
+          </div>
+        </div>
+
+        <!-- SESSION 2: SIX (Afternoon - Write 6 times) -->
+        <div class="session-card" id="sessionCard_six">
+          <div class="session-card-left">
+            <div class="number-circle">6</div>
+            <div class="session-info">
+              <div class="session-name">Six</div>
+              <div class="session-status">Opens at 1:00 PM</div>
+            </div>
+          </div>
+          <div class="session-action">
+            <button class="btn-write-gold" onclick="Cosmos369.openWritingModal('afternoon', 6)">Write</button>
+          </div>
+        </div>
+
+        <!-- SESSION 3: NINE (Evening - Write 9 times) -->
+        <div class="session-card" id="sessionCard_nine">
+          <div class="session-card-left">
+            <div class="number-circle">9</div>
+            <div class="session-info">
+              <div class="session-name">Nine</div>
+              <div class="session-status">Opens at 8:00 PM</div>
+            </div>
+          </div>
+          <div class="session-action">
+            <button class="btn-write-gold" onclick="Cosmos369.openWritingModal('evening', 9)">Write</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sacred Nikola Tesla Wisdom Card -->
+      <div style="background: rgba(15,22,41,0.6); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; text-align: center;">
+        <p style="font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 14px; color: var(--gold-200); margin-bottom: 6px;">
+          â€œIf you only knew the magnificence of the 3, 6, and 9, then you would have the key to the universe.â€
+        </p>
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); font-weight: 600;">â€” Nikola Tesla</span>
+      </div>
+
+    </div>
+
+    <!-- ========================================================
+         VIEW 2: TEMPLATES (Life Aspects Affirmation Library)
+         ======================================================== -->
+    <div class="tab-view" id="view_templates">
+      <div class="page-title-section">
+        <h2 class="page-title">Manifestation Templates</h2>
+        <p class="page-desc">Choose a sacred affirmation for your 369 daily practice</p>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-box-wrap">
+        <span class="search-icon">ðŸ”</span>
+        <input type="text" class="search-input" id="templateSearchInput" placeholder="Search affirmations (e.g. love, money, peace)..." />
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="category-pills-row">
+        <button class="category-pill active" data-cat="all">All Aspects</button>
+        <button class="category-pill" data-cat="Relationship">ðŸ’– Relationship</button>
+        <button class="category-pill" data-cat="Self Care">ðŸŒ¸ Self Care</button>
+        <button class="category-pill" data-cat="Career">ðŸš€ Career</button>
+        <button class="category-pill" data-cat="Business">ðŸ’¼ Business</button>
+        <button class="category-pill" data-cat="Wealth">ðŸ’° Wealth</button>
+        <button class="category-pill" data-cat="Health">ðŸŒ¿ Health</button>
+        <button class="category-pill" data-cat="Inner Peace">ðŸ§˜ Inner Peace</button>
+        <button class="category-pill" data-cat="Spiritual">ðŸŒŒ Spiritual</button>
+      </div>
+
+      <!-- Create Custom Template Button -->
+      <button class="btn-create-custom-template" onclick="Cosmos369.openCustomTemplateModal()">
+        <span>+</span> Write Your Own Custom Affirmation
+      </button>
+
+      <!-- Templates Dynamic List -->
+      <div class="templates-list" id="templatesListContainer">
+        <!-- Rendered by manifest-369.js -->
+      </div>
+    </div>
+
+    <!-- ========================================================
+         VIEW 3: JOURNEY (33 Days Continuous Activity Tracker)
+         ======================================================== -->
+    <div class="tab-view" id="view_journey">
+      <div class="page-title-section">
+        <h2 class="page-title">Sacred 33-Day Journey</h2>
+        <p class="page-desc">33 Days continuous activity to anchor your reality</p>
+      </div>
+
+      <!-- Streak Hero Card -->
+      <div class="streak-hero-card">
+        <div class="streak-circle-large">
+          <div class="streak-number-huge" id="streakHugeNumber">0</div>
+          <div class="streak-circle-sub">Days Active</div>
+        </div>
+        <h3 style="font-size: 18px; color: #ffffff; margin-bottom: 6px;">Goal: 33 Continuous Days</h3>
+        <p style="font-size: 13px; color: var(--gold-300);">
+          33 is the master number of conscious manifestation.
+        </p>
+
+        <div class="streak-rule-notice">
+          <strong>âš¡ Sacred Streak Rule:</strong><br/>
+          Write your manifestation 3 times in the morning, 6 times in the afternoon, and 9 times in the evening. If you miss one time or one day, the streak goes back to 0!
+        </div>
+      </div>
+
+      <!-- 33-Day Constellation Roadmap Grid -->
+      <div class="roadmap-section-title">
+        <span>Constellation Map (33 Days)</span>
+        <span style="font-size: 12px; color: var(--gold-400);">âœ¦ Milestones: 3, 6, 9, 18, 27, 33</span>
+      </div>
+      <div class="days-grid-33" id="daysGrid33">
+        <!-- 33 Day Nodes generated by JS -->
+      </div>
+
+      <!-- Past Manifestation Activity Logs -->
+      <div class="roadmap-section-title">
+        <span>Recent Activity History</span>
+      </div>
+      <div class="history-list" id="manifestationHistoryList">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- ========================================================
+         VIEW 4: ALARMS & SOUND STUDIO
+         ======================================================== -->
+    <div class="tab-view" id="view_alarms">
+      <div class="page-title-section">
+        <h2 class="page-title">Alarms &amp; Sound Studio</h2>
+        <p class="page-desc">Set specific times for morning, afternoon &amp; evening</p>
+      </div>
+
+      <!-- Schedule Timings Card -->
+      <div class="alarm-settings-card">
+        <div class="card-section-heading">
+          <span>â°</span> Daily Manifestation Alarms
+        </div>
+
+        <!-- Morning Alarm (Three) -->
+        <div class="alarm-time-row">
+          <div class="alarm-session-meta">
+            <h4>ðŸŒ… Morning (Three)</h4>
+            <p>Write 3 times after waking</p>
+          </div>
+          <div class="alarm-toggle-wrap">
+            <input type="time" class="alarm-time-picker" id="alarmMorningTime" value="08:00" onchange="Cosmos369.saveAlarmsFromUI()" />
+            <label class="switch">
+              <input type="checkbox" id="alarmMorningToggle" checked onchange="Cosmos369.saveAlarmsFromUI()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Afternoon Alarm (Six) -->
+        <div class="alarm-time-row">
+          <div class="alarm-session-meta">
+            <h4>â˜€ï¸ Afternoon (Six)</h4>
+            <p>Write 6 times at midday</p>
+          </div>
+          <div class="alarm-toggle-wrap">
+            <input type="time" class="alarm-time-picker" id="alarmAfternoonTime" value="13:00" onchange="Cosmos369.saveAlarmsFromUI()" />
+            <label class="switch">
+              <input type="checkbox" id="alarmAfternoonToggle" checked onchange="Cosmos369.saveAlarmsFromUI()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Evening Alarm (Nine) -->
+        <div class="alarm-time-row">
+          <div class="alarm-session-meta">
+            <h4>ðŸŒ™ Evening (Nine)</h4>
+            <p>Write 9 times before sleep</p>
+          </div>
+          <div class="alarm-toggle-wrap">
+            <input type="time" class="alarm-time-picker" id="alarmEveningTime" value="20:00" onchange="Cosmos369.saveAlarmsFromUI()" />
+            <label class="switch">
+              <input type="checkbox" id="alarmEveningToggle" checked onchange="Cosmos369.saveAlarmsFromUI()" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Strict Time Lock Toggle -->
+        <div class="alarm-time-row" style="margin-top: 10px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div class="alarm-session-meta">
+            <h4>ðŸ”’ Lock Until Alarm Time</h4>
+            <p>Keep sessions locked until scheduled time</p>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="strictLockToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Custom Alarm Tone Facility Card -->
+      <div class="alarm-settings-card">
+        <div class="card-section-heading">
+          <span>ðŸ””</span> Custom Alarm Tone Facility
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          Choose a sacred frequency preset or upload your own audio file (MP3 / WAV) from your phone.
+        </p>
+
+        <!-- Presets Selector -->
+        <div class="tone-selector-list" id="toneOptionsContainer">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Upload Custom Audio File Box -->
+        <div class="upload-custom-tone-box">
+          <div style="font-size: 26px; margin-bottom: 4px;">ðŸŽµ</div>
+          <h4 style="font-size: 14px; color: #ffffff; font-weight: 600;">Upload Your Own Alarm Tone</h4>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Supports MP3, WAV, M4A, OGG. Saved locally on your device.
+          </p>
+          <input type="file" id="customToneFileInput" accept="audio/*" style="display: none;" />
+          <button class="btn-upload-tone" onclick="document.getElementById('customToneFileInput').click()">
+            <span>ðŸ“</span> Choose Audio File
+          </button>
+        </div>
+
+        <!-- Volume & Test Button -->
+        <div class="volume-control-wrap">
+          <span style="font-size: 18px;">ðŸ”Š</span>
+          <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="0.8" />
+        </div>
+
+        <button class="btn-test-sound" onclick="Cosmos369.triggerAlarmSound(false)">
+          <span>ðŸ””</span> Test Alarm Sound
+        </button>
+      </div>
+
+      <!-- App Ecosystem Return Link -->
+      <div style="text-align: center; margin-top: 16px; margin-bottom: 24px;">
+        <span style="color: var(--gold-400); font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+          <span>â†</span> Back to Cosmos Gratitude Hub
+        </span>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         VIEW 5: GUIDE & ANDROID INSTALL (Pin like APK)
+         ======================================================== -->
+    <div class="tab-view" id="view_guide">
+      <div class="page-title-section">
+        <h2 class="page-title">How 369 Works</h2>
+        <p class="page-desc">Nikola Teslaâ€™s secret code for conscious creation</p>
+      </div>
+
+      <div class="alarm-settings-card">
+        <h3 style="font-size: 16px; color: var(--gold-200); margin-bottom: 10px;">The 3-6-9 Sacred Rhythm:</h3>
+        <ul style="font-size: 14px; color: var(--text-main); line-height: 1.6; padding-left: 20px; margin-bottom: 16px;">
+          <li style="margin-bottom: 8px;"><strong>Morning (3 Times):</strong> Sets your intention into the universe upon awakening, when your brain waves are fresh and receptive.</li>
+          <li style="margin-bottom: 8px;"><strong>Afternoon (6 Times):</strong> Amplifies your vibrational frequency and maintains conscious alignment during daily momentum.</li>
+          <li><strong>Evening (9 Times):</strong> Anchors your manifestation deep into your subconscious mind right before you drift into sleep.</li>
+        </ul>
+
+        <div style="background: rgba(212,175,55,0.08); border-radius: var(--radius-sm); padding: 12px; border-left: 3px solid var(--gold-400); font-size: 13px; color: var(--gold-200);">
+          <strong>The 33-Day Rule:</strong> Complete all 3 sessions daily for 33 uninterrupted days. If a single time is missed, the streak resets to 0.
+        </div>
+      </div>
+
+      <div class="alarm-settings-card">
+        <div class="card-section-heading">
+          <span>ðŸ“²</span> How to Pin Like an APK on Android
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+          You can install this webapp directly onto your Android phone screen to launch it just like a native APK app!
+        </p>
+
+        <ol style="font-size: 13px; color: #ffffff; line-height: 1.6; padding-left: 20px; margin-bottom: 16px;">
+          <li style="margin-bottom: 8px;">Open this page in <strong>Google Chrome</strong> on your Android phone.</li>
+          <li style="margin-bottom: 8px;">Tap the <strong>three dots menu (â‹®)</strong> in the top-right corner.</li>
+          <li style="margin-bottom: 8px;">Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</li>
+          <li>Confirm by tapping <strong>Install</strong>. The 369 icon will appear on your phone alongside your other apps!</li>
+        </ol>
+
+        <button class="btn-write-gold" style="width: 100%;" onclick="Cosmos369.promptInstallPWA()">
+          ðŸ“± Pin to Phone Now
+        </button>
+      </div>
+    </div>
+
+  </div> <!-- /app-container -->
+
+  <!-- ========================================================
+       MODAL: WRITING STUDIO (Mindful Repetition Input)
+       ======================================================== -->
+  <div class="modal-overlay" id="writingModalOverlay">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-pill"></div>
+
+      <div class="modal-header-row">
+        <h3 class="modal-title" id="writingModalTitle">Three â€” Morning (3x)</h3>
+        <button class="btn-modal-close" onclick="Cosmos369.closeWritingModal()">âœ•</button>
+      </div>
+
+      <!-- Target Reference Quote -->
+      <div class="target-reference-box">
+        <div class="target-ref-label">Focus On Your Manifestation:</div>
+        <div class="target-ref-quote" id="modalTargetRefQuote">
+          â€œI am grounded, present, and enough, exactly as I am.â€
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <span style="font-size: 12px; color: var(--text-muted);">Write each line with emotional presence:</span>
+        <button type="button" style="background:none; border:none; color:var(--gold-300); font-size:12px; cursor:pointer;" onclick="Cosmos369.quickFillAllLines()">âœ¨ Fill All</button>
+      </div>
+
+      <!-- Repetition Inputs Container -->
+      <div class="repetition-lines-group" id="repetitionLinesGroup">
+        <!-- Rendered dynamically for 3, 6, or 9 lines -->
+      </div>
+
+      <!-- Bottom Action Buttons -->
+      <div class="modal-bottom-actions">
+        <button class="btn-complete-session" id="btnCompleteSession" disabled onclick="Cosmos369.completeWritingSession()">
+          Written 0 of 3
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: ACTIVE IN-APP ALARM RINGING OVERLAY
+       ======================================================== -->
+  <div class="alarm-ring-overlay" id="alarmRingOverlay">
+    <div class="pulsing-alarm-icon">ðŸ””</div>
+    <h2 class="alarm-session-alert-title" id="alarmRingSessionTitle">Time for your 369 Practice!</h2>
+    <p class="alarm-session-alert-sub" id="alarmRingSessionSub">
+      Pause what you are doing. Connect to your manifestation and write into the universe.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px;">
+      <button class="btn-write-gold" style="width: 100%; font-size: 16px; padding: 15px;" onclick="Cosmos369.writeNowFromAlarm('morning', 3)">
+        âœï¸ Write Manifestation Now
+      </button>
+      <button class="btn-quote-action" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;" onclick="Cosmos369.dismissActiveAlarm()">
+        Dismiss Alarm
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       MODAL: ANDROID PWA INSTALL GUIDE
+       ======================================================== -->
+  <div class="modal-overlay" id="androidInstallGuideModal">
+    <div class="modal-content-sheet">
+      <div class="modal-drag-pill"></div>
+      <div class="modal-header-row">
+        <h3 class="modal-title">Install on Android</h3>
+        <button class="btn-modal-close" onclick="document.getElementById('androidInstallGuideModal').classList.remove('active')">âœ•</button>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-size: 40px; margin-bottom: 8px;">ðŸ“²</div>
+        <h4 style="font-size: 16px; color: var(--gold-200); margin-bottom: 6px;">Pin like an APK in 3 Steps:</h4>
+      </div>
+
+      <div style="background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
+        <p style="margin-bottom: 12px;"><strong>1.</strong> Open this page in <strong>Google Chrome</strong>.</p>
+        <p style="margin-bottom: 12px;"><strong>2.</strong> Tap the <strong>three dots (â‹®)</strong> at the top right of Chrome.</p>
+        <p style="margin-bottom: 12px;"><strong>3.</strong> Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</p>
+        <p style="color: var(--gold-300);">âœ¨ Done! Launch it directly from your home screen every morning, afternoon, and evening.</p>
+      </div>
+
+      <button class="btn-write-gold" style="width: 100%;" onclick="document.getElementById('androidInstallGuideModal').classList.remove('active')">
+        Got It!
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       BOTTOM TAB NAVIGATION BAR (Mobile ergonomics)
+       ======================================================== -->
+  <nav class="bottom-nav">
+    <!-- Today -->
+    <button class="nav-tab-btn active" id="tabBtn_today" onclick="Cosmos369.switchTab('today')">
+      <span class="tab-icon">ðŸ“…</span>
+      <span>Today</span>
+    </button>
+
+    <!-- Templates -->
+    <button class="nav-tab-btn" id="tabBtn_templates" onclick="Cosmos369.switchTab('templates')">
+      <span class="tab-icon">ðŸ“œ</span>
+      <span>Templates</span>
+    </button>
+
+    <!-- Journey (33 Days) -->
+    <button class="nav-tab-btn" id="tabBtn_journey" onclick="Cosmos369.switchTab('journey')">
+      <span class="tab-icon">ðŸŒŸ</span>
+      <span>Journey</span>
+    </button>
+
+    <!-- Alarms & Sound -->
+    <button class="nav-tab-btn" id="tabBtn_alarms" onclick="Cosmos369.switchTab('alarms')">
+      <span class="tab-icon">â°</span>
+      <span>Alarms</span>
+    </button>
+
+    <!-- Guide -->
+    <button class="nav-tab-btn" id="tabBtn_guide" onclick="Cosmos369.switchTab('guide')">
+      <span class="tab-icon">â„¹ï¸</span>
+      <span>Guide</span>
+    </button>
+  </nav>
+
+  <!-- JavaScript Engine -->
+  <script src="js/manifest-369.js"></script>
+</body>
+</html>
+

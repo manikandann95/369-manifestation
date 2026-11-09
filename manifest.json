@@ -1,0 +1,55 @@
+{
+  "name": "369 Manifestation Method",
+  "short_name": "369 Method",
+  "description": "Daily 369 Manifestation practice with custom alarms, life aspect templates, and 33-day sacred streak tracker.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#070a14",
+  "theme_color": "#070a14",
+  "categories": ["lifestyle", "productivity", "wellness"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-369.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Today's Practice",
+      "short_name": "Today",
+      "description": "Open today's 3-6-9 manifestation practice",
+      "url": "./#today",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Templates Library",
+      "short_name": "Templates",
+      "description": "Browse manifestation sentences by life aspect",
+      "url": "./#templates",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Alarms & Sound",
+      "short_name": "Alarms",
+      "description": "Configure 369 alarms and custom tones",
+      "url": "./#alarms",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
