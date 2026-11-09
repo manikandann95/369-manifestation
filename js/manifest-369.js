@@ -602,8 +602,8 @@
     const activeCat = localStorage.getItem(KEYS.ACTIVE_CATEGORY) || 'Self Care';
     const quoteEl = document.getElementById('activeAffirmationText');
     const catTagEl = document.getElementById('activeAffirmationCategory');
-    if (quoteEl) quoteEl.textContent = `“${activeText}”`;
-    if (catTagEl) catTagEl.innerHTML = `✦ ${activeCat}`;
+    if (quoteEl) quoteEl.innerHTML = `&ldquo;${escapeHtml(activeText)}&rdquo;`;
+    if (catTagEl) catTagEl.innerHTML = `✦ ${escapeHtml(activeCat)}`;
 
     // 4. Update the Three Session Cards
     updateSessionCard('three', 3, 'morning', todayLog.morning);
@@ -617,6 +617,25 @@
   function updateSessionCard(cardId, repCount, sessionKey, isDone) {
     const cardEl = document.getElementById(`sessionCard_${cardId}`);
     if (!cardEl) return;
+
+    const today = getTodayString();
+    const logs = getDailyLogs();
+    const todayLog = logs[today] || { morning: false, afternoon: false, evening: false };
+
+    // Sequential Unlock Restriction:
+    // Three is always open.
+    // Six requires Three (Morning) to be completed.
+    // Nine requires Six (Afternoon) to be completed.
+    let isSequentialLocked = false;
+    let lockedPrereq = '';
+
+    if (sessionKey === 'afternoon' && !todayLog.morning) {
+      isSequentialLocked = true;
+      lockedPrereq = 'three';
+    } else if (sessionKey === 'evening' && !todayLog.afternoon) {
+      isSequentialLocked = true;
+      lockedPrereq = todayLog.morning ? 'six' : 'three';
+    }
 
     const alarms = JSON.parse(localStorage.getItem(KEYS.ALARMS) || JSON.stringify(DEFAULT_ALARMS));
     const alarmTime = alarms[sessionKey] ? alarms[sessionKey].time : '08:00';
@@ -634,13 +653,27 @@
     const statusEl = cardEl.querySelector('.session-status');
     const actionEl = cardEl.querySelector('.session-action');
 
-    cardEl.classList.remove('is-active', 'is-completed');
+    cardEl.classList.remove('is-active', 'is-completed', 'is-locked');
 
     if (isDone) {
       cardEl.classList.add('is-completed');
       if (statusEl) statusEl.textContent = `Completed ${repCount}/${repCount} ✓`;
       if (actionEl) {
         actionEl.innerHTML = `<span class="completed-pill">Done ✦</span>`;
+      }
+    } else if (isSequentialLocked) {
+      cardEl.classList.add('is-locked');
+      const prereqName = lockedPrereq === 'six' ? 'Six (Afternoon)' : 'Three (Morning)';
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:var(--text-dim); display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Complete ${prereqName} first</span>`;
+      }
+      if (actionEl) {
+        actionEl.innerHTML = `
+          <button class="btn-locked-action" onclick="Cosmos369.showLockedNotice('${lockedPrereq}')" title="Locked: Complete previous session first">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Locked</span>
+          </button>
+        `;
       }
     } else if (isTimeReached) {
       cardEl.classList.add('is-active');
@@ -713,7 +746,7 @@
                 <span>${d}</span>
                 <span>${statusIcon}</span>
               </div>
-              <div class="history-item-quote">“${entry.quote || 'Manifestation in progress'}”</div>
+              <div class="history-item-quote">&ldquo;${escapeHtml(entry.quote || 'Manifestation in progress')}&rdquo;</div>
             </div>
           `;
         }).join('');
@@ -725,7 +758,29 @@
   let currentWritingSession = null;
   let currentRepTarget = 3;
 
+  function showLockedNotice(prereq) {
+    if (prereq === 'six') {
+      showToast('🔒 Sequential Restriction: Complete Six (Afternoon) first to unlock Nine!');
+    } else {
+      showToast('🔒 Sequential Restriction: Complete Three (Morning) first to unlock this session!');
+    }
+  }
+
   function openWritingModal(sessionKey, count) {
+    const today = getTodayString();
+    const logs = getDailyLogs();
+    const todayLog = logs[today] || { morning: false, afternoon: false, evening: false };
+
+    // Sequential Unlock Enforcement
+    if (sessionKey === 'afternoon' && !todayLog.morning) {
+      showLockedNotice('three');
+      return;
+    }
+    if (sessionKey === 'evening' && !todayLog.afternoon) {
+      showLockedNotice(todayLog.morning ? 'six' : 'three');
+      return;
+    }
+
     currentWritingSession = sessionKey;
     currentRepTarget = count;
 
@@ -735,15 +790,15 @@
     const linesGroup = document.getElementById('repetitionLinesGroup');
 
     const sessionNames = {
-      morning: 'Three — Morning Vibration',
-      afternoon: 'Six — Afternoon Amplification',
-      evening: 'Nine — Evening Subconscious Anchor'
+      morning: 'Three - Morning Vibration',
+      afternoon: 'Six - Afternoon Amplification',
+      evening: 'Nine - Evening Subconscious Anchor'
     };
 
     const activeAffirmation = localStorage.getItem(KEYS.ACTIVE_AFFIRMATION) || DEFAULT_TEMPLATES[1].text;
 
     if (titleEl) titleEl.textContent = `${sessionNames[sessionKey]} (${count}x)`;
-    if (refQuoteEl) refQuoteEl.textContent = `“${activeAffirmation}”`;
+    if (refQuoteEl) refQuoteEl.innerHTML = `&ldquo;${escapeHtml(activeAffirmation)}&rdquo;`;
 
     // Render repetition input fields
     linesGroup.innerHTML = '';
@@ -884,7 +939,7 @@
             <span class="template-cat-tag">✦ ${item.badge || item.category}</span>
             ${isActive ? '<span style="font-size:11px; color:var(--success); font-weight:700;">ACTIVE NOW</span>' : ''}
           </div>
-          <div class="template-body-text">“${item.text}”</div>
+          <div class="template-body-text">&ldquo;${escapeHtml(item.text)}&rdquo;</div>
           <div class="template-footer-actions">
             ${isActive 
               ? `<button class="btn-use-template active-badge">In Practice ✓</button>` 
@@ -1394,6 +1449,7 @@
     switchTab,
     openWritingModal,
     closeWritingModal,
+    showLockedNotice,
     quickFillLine,
     quickFillAllLines,
     completeWritingSession,
