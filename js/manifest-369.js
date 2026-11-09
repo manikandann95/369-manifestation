@@ -1358,6 +1358,18 @@
       loadAlarmSettings();
     } else if (tabId === 'journey') {
       updateUI();
+    } else if (tabId === 'vision') {
+      loadVisionBoard();
+    } else if (tabId === 'techniques') {
+      renderTechniques();
+    } else if (tabId === 'solfeggio') {
+      updateSolfeggioUI();
+    } else if (tabId === 'vault') {
+      renderVault();
+    } else if (tabId === 'scripting') {
+      renderScripting();
+    } else if (tabId === 'quotes') {
+      renderQuotes('all');
     }
   }
 
@@ -1442,7 +1454,806 @@
         updateUI();
       });
     }
+
+    // Vision Board File Upload Listener
+    const vbInput = document.getElementById('vbPhotoInput');
+    if (vbInput) {
+      vbInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0];
+          const caption = prompt('Add a sacred manifestation caption for this vision image:', file.name.replace(/\.[^/.]+$/, ''));
+          addVisionImage(file, caption || 'Manifested Reality');
+        }
+      });
+    }
+
+    // Scripting live word count
+    const scriptArea = document.getElementById('scriptingTextarea');
+    if (scriptArea) {
+      scriptArea.addEventListener('input', (e) => {
+        const words = e.target.value.trim().split(/\s+/).filter(Boolean).length;
+        const countEl = document.getElementById('scriptingWordCount');
+        if (countEl) countEl.textContent = `${words} words`;
+      });
+    }
   });
+
+  // ============================================================
+  //  1. VISION BOARD & LIGHTBOX ZOOM / SLIDESHOW ENGINE
+  // ============================================================
+  const VB_STORAGE_KEY = 'cosmos_369_vision_board_items';
+  let vbItems = [];
+  let currentLbIndex = 0;
+  let currentZoom = 1.0;
+  let slideshowTimer = null;
+  let isSlideshowPlaying = false;
+
+  // Default high-vibe cosmic aesthetic templates
+  const DEFAULT_VB_ITEMS = [
+    {
+      id: 'vb_def_1',
+      caption: 'Financial Sanctuary & Pure Freedom',
+      src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%231e2b4d"/><stop offset="100%" stop-color="%230b1021"/></linearGradient></defs><rect width="400" height="400" fill="url(%23g1)"/><circle cx="200" cy="180" r="80" fill="none" stroke="%23d4af37" stroke-width="2"/><text x="200" y="190" font-family="serif" font-size="34" fill="%23fae4a8" font-weight="bold" text-anchor="middle">$100,000+</text><text x="200" y="290" font-family="sans-serif" font-size="14" fill="%23e5c07b" letter-spacing="3" text-anchor="middle">PASSIVE ABUNDANCE</text></svg>'
+    },
+    {
+      id: 'vb_def_2',
+      caption: 'Serene Ocean Villa Sanctuary',
+      src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%230d2538"/><stop offset="100%" stop-color="%2306111a"/></linearGradient></defs><rect width="400" height="400" fill="url(%23g2)"/><path d="M50 300 Q200 240 350 300 L350 400 L50 400 Z" fill="%23143c59"/><circle cx="200" cy="140" r="50" fill="%23eed074" opacity="0.85"/><text x="200" y="350" font-family="sans-serif" font-size="14" fill="%23ffffff" letter-spacing="3" text-anchor="middle">PEACEFUL OASIS</text></svg>'
+    },
+    {
+      id: 'vb_def_3',
+      caption: 'Divine Soulmate Sacred Connection',
+      src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%232b1329"/><stop offset="100%" stop-color="%230b0611"/></linearGradient></defs><rect width="400" height="400" fill="url(%23g3)"/><circle cx="160" cy="180" r="65" fill="none" stroke="%23e5c07b" stroke-width="2"/><circle cx="240" cy="180" r="65" fill="none" stroke="%23e5c07b" stroke-width="2"/><text x="200" y="320" font-family="sans-serif" font-size="13" fill="%23fae4a8" letter-spacing="3" text-anchor="middle">UNCONDITIONAL LOVE</text></svg>'
+    },
+    {
+      id: 'vb_def_4',
+      caption: 'Radiant Cellular Vitality & Longevity',
+      src: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="%23132e1c"/><stop offset="100%" stop-color="%2307130b"/></linearGradient></defs><rect width="400" height="400" fill="url(%23g4)"/><circle cx="200" cy="180" r="75" fill="none" stroke="%2310b981" stroke-width="2"/><text x="200" y="190" font-family="serif" font-size="36" fill="%2310b981" text-anchor="middle">✦</text><text x="200" y="310" font-family="sans-serif" font-size="13" fill="%23a7f3d0" letter-spacing="3" text-anchor="middle">PERFECT HEALTH</text></svg>'
+    }
+  ];
+
+  function getStoredVisionItems() {
+    const saved = localStorage.getItem(VB_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_VB_ITEMS;
+  }
+
+  function saveVisionItems(items) {
+    localStorage.setItem(VB_STORAGE_KEY, JSON.stringify(items));
+  }
+
+  function loadVisionBoard() {
+    vbItems = getStoredVisionItems();
+    const container = document.getElementById('vbGridContainer');
+    if (!container) return;
+
+    if (vbItems.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:30px; color:var(--text-muted);">
+          <p>Your vision board is waiting for your dreams.</p>
+          <button class="btn-write-gold" style="margin-top:10px;" onclick="document.getElementById('vbPhotoInput').click()">+ Add First Vision Photo</button>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = vbItems.map((item, idx) => `
+      <div class="vb-image-card" onclick="Cosmos369.openLightbox(${idx})">
+        <img src="${item.src}" class="vb-img-thumb" alt="${escapeHtml(item.caption)}" loading="lazy" />
+        <div class="vb-card-caption-overlay">
+          <span>${escapeHtml(item.caption)}</span>
+          <button class="vb-delete-btn" title="Remove" onclick="event.stopPropagation(); Cosmos369.deleteVisionImage('${item.id}')">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function addVisionImage(file, caption) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const items = getStoredVisionItems();
+      items.unshift({
+        id: 'vb_' + Date.now(),
+        caption: caption.trim(),
+        src: e.target.result,
+        addedAt: Date.now()
+      });
+      saveVisionItems(items);
+      loadVisionBoard();
+      showToast('Vision image added to your sacred board! ✦');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function deleteVisionImage(id) {
+    if (confirm('Remove this image from your vision board?')) {
+      let items = getStoredVisionItems().filter(i => i.id !== id);
+      saveVisionItems(items);
+      loadVisionBoard();
+      showToast('Image removed');
+    }
+  }
+
+  // --- Lightbox Zoom In & Zoom Out Controls ---
+  function openLightbox(index) {
+    currentLbIndex = index;
+    currentZoom = 1.0;
+    const item = vbItems[currentLbIndex];
+    if (!item) return;
+
+    const modal = document.getElementById('vbLightboxModal');
+    const img = document.getElementById('lbFullImg');
+    const cap = document.getElementById('lbCaption');
+    const zoomText = document.getElementById('lbZoomDisplay');
+
+    if (img) {
+      img.src = item.src;
+      img.style.transform = `scale(1.0)`;
+    }
+    if (cap) cap.textContent = item.caption;
+    if (zoomText) zoomText.textContent = `100%`;
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeLightbox() {
+    const modal = document.getElementById('vbLightboxModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function zoomIn() {
+    currentZoom = Math.min(3.5, currentZoom + 0.35);
+    applyZoom();
+  }
+
+  function zoomOut() {
+    currentZoom = Math.max(0.6, currentZoom - 0.35);
+    applyZoom();
+  }
+
+  function resetZoom() {
+    currentZoom = 1.0;
+    applyZoom();
+  }
+
+  function applyZoom() {
+    const img = document.getElementById('lbFullImg');
+    const zoomText = document.getElementById('lbZoomDisplay');
+    if (img) img.style.transform = `scale(${currentZoom.toFixed(2)})`;
+    if (zoomText) zoomText.textContent = `${Math.round(currentZoom * 100)}%`;
+  }
+
+  function nextLightbox() {
+    if (vbItems.length === 0) return;
+    currentLbIndex = (currentLbIndex + 1) % vbItems.length;
+    openLightbox(currentLbIndex);
+  }
+
+  function prevLightbox() {
+    if (vbItems.length === 0) return;
+    currentLbIndex = (currentLbIndex - 1 + vbItems.length) % vbItems.length;
+    openLightbox(currentLbIndex);
+  }
+
+  // --- Slideshow Mode ---
+  function startSlideshow() {
+    vbItems = getStoredVisionItems();
+    if (vbItems.length === 0) {
+      showToast('Please add vision images first!');
+      return;
+    }
+    const overlay = document.getElementById('vbSlideshowOverlay');
+    if (!overlay) return;
+
+    currentLbIndex = 0;
+    renderSlideshowSlide();
+    overlay.classList.add('active');
+    isSlideshowPlaying = true;
+    startSlideshowTimer();
+    playSynthTone('harp', 0.4);
+  }
+
+  function renderSlideshowSlide() {
+    const item = vbItems[currentLbIndex];
+    if (!item) return;
+    const img = document.getElementById('ssImg');
+    const cap = document.getElementById('ssCaption');
+    if (img) img.src = item.src;
+    if (cap) cap.textContent = item.caption;
+  }
+
+  function startSlideshowTimer() {
+    clearInterval(slideshowTimer);
+    slideshowTimer = setInterval(() => {
+      if (vbItems.length > 0) {
+        currentLbIndex = (currentLbIndex + 1) % vbItems.length;
+        renderSlideshowSlide();
+      }
+    }, 4500);
+  }
+
+  function toggleSlideshowPlay() {
+    isSlideshowPlaying = !isSlideshowPlaying;
+    const btn = document.getElementById('btnSsPlayPause');
+    if (isSlideshowPlaying) {
+      startSlideshowTimer();
+      if (btn) btn.textContent = '⏸ Pause';
+    } else {
+      clearInterval(slideshowTimer);
+      if (btn) btn.textContent = '▶ Play';
+    }
+  }
+
+  function nextSlide() {
+    if (vbItems.length === 0) return;
+    currentLbIndex = (currentLbIndex + 1) % vbItems.length;
+    renderSlideshowSlide();
+    if (isSlideshowPlaying) startSlideshowTimer();
+  }
+
+  function prevSlide() {
+    if (vbItems.length === 0) return;
+    currentLbIndex = (currentLbIndex - 1 + vbItems.length) % vbItems.length;
+    renderSlideshowSlide();
+    if (isSlideshowPlaying) startSlideshowTimer();
+  }
+
+  function stopSlideshow() {
+    clearInterval(slideshowTimer);
+    isSlideshowPlaying = false;
+    const overlay = document.getElementById('vbSlideshowOverlay');
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  // ============================================================
+  //  2. OTHER MANIFESTATION TECHNIQUES (55x5, 777, 44x4, 33x3)
+  // ============================================================
+  const TECHNIQUES_KEY = 'cosmos_369_techniques_data';
+
+  const TECHNIQUE_CONFIGS = {
+    '55x5': {
+      id: '55x5',
+      title: '55x5 Manifestation Code',
+      badge: '55 Reps · 5 Days',
+      targetReps: 55,
+      totalDays: 5,
+      desc: 'Write your manifestation sentence 55 times daily for 5 continuous days. This saturates the subconscious mind to shatter resistance.'
+    },
+    '777': {
+      id: '777',
+      title: '777 Angelic Alignment Ritual',
+      badge: '7 Morning + 7 Night · 7 Days',
+      targetReps: 14, // 7 morning, 7 night
+      totalDays: 7,
+      desc: '7 repetitions at sunrise and 7 repetitions right before sleep for 7 consecutive days. Anchors master divine luck and synchronization.'
+    },
+    '44x4': {
+      id: '44x4',
+      title: '44x4 Foundation Ritual',
+      badge: '44 Reps · 4 Days',
+      targetReps: 44,
+      totalDays: 4,
+      desc: 'Write 44 repetitions for 4 days straight to construct a permanent, grounded energetic foundation for your biggest life goals.'
+    },
+    '33x3': {
+      id: '33x3',
+      title: '33x3 Rapid Breakthrough Spark',
+      badge: '33 Reps · 3 Days',
+      targetReps: 33,
+      totalDays: 3,
+      desc: '33 repetitions daily for 3 days. A fast, intense burst of vibrational frequency for urgent breakthroughs and sudden opportunities.'
+    }
+  };
+
+  function getTechniquesData() {
+    const saved = localStorage.getItem(TECHNIQUES_KEY);
+    return saved ? JSON.parse(saved) : {
+      '55x5': { currentDay: 1, completedDays: [], affirmation: 'I am in complete abundance and financial freedom.' },
+      '777': { currentDay: 1, completedDays: [], affirmation: 'Miracles and divine favor follow me everywhere I go.' },
+      '44x4': { currentDay: 1, completedDays: [], affirmation: 'My success is firmly rooted, unshakable, and expanding.' },
+      '33x3': { currentDay: 1, completedDays: [], affirmation: 'Sudden positive breakthroughs are manifesting in my life right now.' }
+    };
+  }
+
+  function saveTechniquesData(data) {
+    localStorage.setItem(TECHNIQUES_KEY, JSON.stringify(data));
+  }
+
+  function renderTechniques() {
+    const container = document.getElementById('techniquesListContainer');
+    if (!container) return;
+
+    const data = getTechniquesData();
+
+    container.innerHTML = Object.keys(TECHNIQUE_CONFIGS).map(key => {
+      const cfg = TECHNIQUE_CONFIGS[key];
+      const state = data[key] || { currentDay: 1, completedDays: [], affirmation: '' };
+      const completedCount = state.completedDays.length;
+      const isFinished = completedCount >= cfg.totalDays;
+
+      let dotsHtml = '';
+      for (let d = 1; d <= cfg.totalDays; d++) {
+        const isDone = state.completedDays.includes(d);
+        dotsHtml += `<div class="tech-day-dot ${isDone ? 'done' : ''}">${isDone ? '✓' : d}</div>`;
+      }
+
+      return `
+        <div class="technique-item-card">
+          <div class="technique-header-row">
+            <h3 class="technique-title">${cfg.title}</h3>
+            <span class="technique-badge">${cfg.badge}</span>
+          </div>
+          <p class="technique-desc">${cfg.desc}</p>
+          <div style="background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: var(--radius-sm); margin-bottom: 12px; font-size: 13px; color: var(--gold-200); font-style: italic;">
+            &ldquo;${escapeHtml(state.affirmation || 'Choose your affirmation')}&rdquo;
+          </div>
+          <div class="technique-meta-row">
+            <div class="technique-days-tracker">
+              ${dotsHtml}
+            </div>
+            <button class="btn-write-gold" style="padding: 8px 18px; font-size: 13px;" onclick="Cosmos369.openTechniqueStudio('${cfg.id}')">
+              ${isFinished ? 'Completed ✦' : `Day ${Math.min(cfg.totalDays, completedCount + 1)} · Practice`}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  let activeTechKey = null;
+
+  function openTechniqueStudio(techKey) {
+    activeTechKey = techKey;
+    const cfg = TECHNIQUE_CONFIGS[techKey];
+    const data = getTechniquesData();
+    const state = data[techKey];
+
+    const overlay = document.getElementById('techniqueStudioModal');
+    const titleEl = document.getElementById('techStudioTitle');
+    const quoteEl = document.getElementById('techStudioAffirmation');
+    const linesGroup = document.getElementById('techRepetitionLines');
+
+    if (titleEl) titleEl.textContent = `${cfg.title} (Day ${state.currentDay} of ${cfg.totalDays})`;
+    if (quoteEl) quoteEl.textContent = `“${state.affirmation}”`;
+
+    linesGroup.innerHTML = '';
+    const repsToRender = cfg.targetReps;
+
+    for (let i = 1; i <= repsToRender; i++) {
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'rep-line-item';
+      lineDiv.id = `techRepLine_${i}`;
+      lineDiv.innerHTML = `
+        <div class="rep-counter-badge">${i}</div>
+        <input type="text" class="rep-input-field tech-rep-input" placeholder="Type repetition #${i}..." data-line="${i}" />
+        <button type="button" class="btn-fill-suggest" onclick="Cosmos369.quickFillTechniqueLine(${i})">Fill</button>
+      `;
+
+      const input = lineDiv.querySelector('.tech-rep-input');
+      input.addEventListener('input', (e) => {
+        if (e.target.value.trim().length > 3) {
+          lineDiv.classList.add('completed');
+        } else {
+          lineDiv.classList.remove('completed');
+        }
+        playKeyChime();
+        updateTechCompleteBtn();
+      });
+
+      linesGroup.appendChild(lineDiv);
+    }
+
+    updateTechCompleteBtn();
+    overlay.classList.add('active');
+  }
+
+  function closeTechniqueStudio() {
+    const overlay = document.getElementById('techniqueStudioModal');
+    if (overlay) overlay.classList.remove('active');
+    activeTechKey = null;
+  }
+
+  function quickFillTechniqueLine(lineIdx) {
+    const data = getTechniquesData();
+    const state = data[activeTechKey];
+    const input = document.querySelector(`.tech-rep-input[data-line="${lineIdx}"]`);
+    if (input) {
+      input.value = state.affirmation;
+      const item = document.getElementById(`techRepLine_${lineIdx}`);
+      if (item) item.classList.add('completed');
+      playKeyChime();
+      updateTechCompleteBtn();
+    }
+  }
+
+  function quickFillAllTechniqueLines() {
+    const data = getTechniquesData();
+    const state = data[activeTechKey];
+    const inputs = document.querySelectorAll('.tech-rep-input');
+    inputs.forEach(input => {
+      input.value = state.affirmation;
+      const line = input.getAttribute('data-line');
+      const item = document.getElementById(`techRepLine_${line}`);
+      if (item) item.classList.add('completed');
+    });
+    playSynthTone('harp', 0.5);
+    updateTechCompleteBtn();
+  }
+
+  function updateTechCompleteBtn() {
+    if (!activeTechKey) return;
+    const cfg = TECHNIQUE_CONFIGS[activeTechKey];
+    const completed = document.querySelectorAll('.rep-line-item.completed').length;
+    const btn = document.getElementById('btnCompleteTechDay');
+    if (btn) {
+      const isDone = completed >= cfg.targetReps;
+      btn.disabled = !isDone;
+      btn.textContent = isDone ? `Complete Day Practice ✦ Anchor` : `Written ${completed} of ${cfg.targetReps}`;
+    }
+  }
+
+  function completeTechniqueDay() {
+    if (!activeTechKey) return;
+    const cfg = TECHNIQUE_CONFIGS[activeTechKey];
+    const data = getTechniquesData();
+    const state = data[activeTechKey];
+
+    if (!state.completedDays.includes(state.currentDay)) {
+      state.completedDays.push(state.currentDay);
+    }
+    if (state.currentDay < cfg.totalDays) {
+      state.currentDay += 1;
+    }
+    saveTechniquesData(data);
+    closeTechniqueStudio();
+    triggerCelebrationParticles();
+    playSynthTone('solfeggio', 0.85);
+    showToast(`🎉 ${cfg.title} Day marked complete!`);
+    renderTechniques();
+  }
+
+  // ============================================================
+  //  3. SOLFEGGIO FREQUENCIES PURE TONE SYNTHESIZER
+  // ============================================================
+  let solfeggioOsc = null;
+  let solfeggioGain = null;
+  let solfeggioActiveHz = 528;
+  let isSolfeggioPlaying = false;
+  let solfeggioTimer = null;
+  let solfeggioTimerRemaining = 0;
+
+  const SOLFEGGIO_METAS = {
+    369: { name: 'Nikola Tesla Code & Universal Creation', desc: 'Harmonizes your brain waves with the sacred 3-6-9 vortex of conscious reality manifestation.' },
+    432: { name: 'Natural Cosmic Harmony & Deep Healing', desc: 'The universal organic tuning frequency. Regulates the nervous system, slows pulse, and dissolves anxiety.' },
+    528: { name: 'Miracle Tone & DNA Transformation', desc: 'The Solfeggio frequency of miracles, spiritual repair, deep heart opening, and transformation.' },
+    639: { name: 'Sacred Relationships & Connection', desc: 'Fosters deep empathy, harmonious relationships, and emotional release.' },
+    963: { name: 'Pineal Awakening & Crown Intuition', desc: 'Direct connection to higher intelligence and pure cosmic consciousness.' }
+  };
+
+  function setSolfeggioFreq(hz) {
+    solfeggioActiveHz = hz;
+    if (isSolfeggioPlaying && solfeggioOsc) {
+      const ctx = getAudioContext();
+      solfeggioOsc.frequency.setValueAtTime(hz, ctx.currentTime);
+    }
+    updateSolfeggioUI();
+  }
+
+  function updateSolfeggioUI() {
+    const hzDisplay = document.getElementById('solfeggioHzNumber');
+    const nameDisplay = document.getElementById('solfeggioTitleName');
+    const descDisplay = document.getElementById('solfeggioDescText');
+
+    if (hzDisplay) hzDisplay.textContent = solfeggioActiveHz;
+    const meta = SOLFEGGIO_METAS[solfeggioActiveHz] || { name: `${solfeggioActiveHz} Hz Tone`, desc: 'Continuous pure frequency.' };
+    if (nameDisplay) nameDisplay.textContent = meta.name;
+    if (descDisplay) descDisplay.textContent = meta.desc;
+
+    document.querySelectorAll('.freq-btn-pill').forEach(btn => {
+      const btnHz = parseInt(btn.getAttribute('data-hz'), 10);
+      btn.classList.toggle('active', btnHz === solfeggioActiveHz);
+    });
+  }
+
+  function toggleSolfeggio() {
+    if (isSolfeggioPlaying) {
+      stopSolfeggio();
+    } else {
+      startSolfeggio();
+    }
+  }
+
+  function startSolfeggio() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    stopSolfeggio();
+
+    solfeggioOsc = ctx.createOscillator();
+    solfeggioGain = ctx.createGain();
+
+    solfeggioOsc.type = 'sine';
+    solfeggioOsc.frequency.setValueAtTime(solfeggioActiveHz, ctx.currentTime);
+
+    // Warm soft attack
+    const volume = 0.65;
+    solfeggioGain.gain.setValueAtTime(0, ctx.currentTime);
+    solfeggioGain.gain.linearRampToValueAtTime(volume * 0.35, ctx.currentTime + 1.2);
+
+    solfeggioOsc.connect(solfeggioGain);
+    solfeggioGain.connect(ctx.destination);
+    solfeggioOsc.start();
+
+    isSolfeggioPlaying = true;
+    const pulseRing = document.getElementById('freqPulseRing');
+    const playBtn = document.getElementById('btnMasterPlaySolfeggio');
+
+    if (pulseRing) pulseRing.classList.add('playing');
+    if (playBtn) playBtn.innerHTML = `<span>⏹</span> Stop ${solfeggioActiveHz} Hz Frequency`;
+  }
+
+  function stopSolfeggio() {
+    if (solfeggioOsc) {
+      try {
+        const ctx = getAudioContext();
+        if (solfeggioGain && ctx) {
+          solfeggioGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+        }
+        setTimeout(() => {
+          if (solfeggioOsc) {
+            solfeggioOsc.stop();
+            solfeggioOsc.disconnect();
+            solfeggioOsc = null;
+          }
+        }, 550);
+      } catch (e) {}
+    }
+    isSolfeggioPlaying = false;
+    clearInterval(solfeggioTimer);
+
+    const pulseRing = document.getElementById('freqPulseRing');
+    const playBtn = document.getElementById('btnMasterPlaySolfeggio');
+    if (pulseRing) pulseRing.classList.remove('playing');
+    if (playBtn) playBtn.innerHTML = `<span>▶</span> Play Continuous ${solfeggioActiveHz} Hz`;
+  }
+
+  function setSolfeggioTimer(minutes) {
+    document.querySelectorAll('.solfeggio-option-pill[data-timer]').forEach(p => p.classList.remove('active'));
+    event?.target?.classList.add('active');
+
+    clearInterval(solfeggioTimer);
+    if (minutes === 0) {
+      showToast('Frequency set to Continuous play');
+      return;
+    }
+
+    solfeggioTimerRemaining = minutes * 60;
+    showToast(`Timer set: ${minutes} minutes of sacred alignment`);
+
+    solfeggioTimer = setInterval(() => {
+      solfeggioTimerRemaining--;
+      if (solfeggioTimerRemaining <= 0) {
+        stopSolfeggio();
+        showToast('Solfeggio meditation session complete ✦');
+      }
+    }, 1000);
+  }
+
+  // ============================================================
+  //  4. FUTURE SELF VAULT (Time-Locked Encrypted Letter)
+  // ============================================================
+  const VAULT_KEY = 'cosmos_369_future_vault_letters';
+
+  function getVaultLetters() {
+    const saved = localStorage.getItem(VAULT_KEY);
+    return saved ? JSON.parse(saved) : [];
+  }
+
+  function saveVaultLetters(letters) {
+    localStorage.setItem(VAULT_KEY, JSON.stringify(letters));
+  }
+
+  function renderVault() {
+    const container = document.getElementById('vaultLettersListContainer');
+    if (!container) return;
+
+    const letters = getVaultLetters();
+    if (letters.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:30px 20px; color:var(--text-muted);">
+          <p>Your vault is empty. Seal your first letter to your future self.</p>
+          <button class="btn-write-gold" style="margin-top:10px;" onclick="Cosmos369.openNewLetterModal()">+ Write Time-Locked Letter</button>
+        </div>
+      `;
+      return;
+    }
+
+    const now = Date.now();
+
+    container.innerHTML = letters.map(item => {
+      const unlockTime = new Date(item.unlockDate).getTime();
+      const isReady = now >= unlockTime;
+      const diffMs = unlockTime - now;
+
+      let countdownStr = 'Unlocked ✦';
+      if (!isReady) {
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        countdownStr = days > 0 ? `Unlocks in ${days}d ${hours}h` : `Unlocks in ${hours}h`;
+      }
+
+      return `
+        <div class="vault-letter-item ${isReady ? 'is-unlocked' : ''}">
+          <div class="vault-item-top">
+            <span class="vault-item-title">${escapeHtml(item.title)}</span>
+            <span class="vault-countdown-pill">${isReady ? 'Ready to Open ✓' : countdownStr}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
+            Sealed on ${new Date(item.createdAt).toLocaleDateString()} &bull; Target Unlock: ${new Date(item.unlockDate).toLocaleDateString()}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; color:var(--gold-400);">
+              ${isReady ? '✦ Seal dissolved by time' : '🔒 Time-Locked & Sealed'}
+            </span>
+            ${isReady 
+              ? `<button class="btn-write-gold" style="padding:6px 16px; font-size:12px;" onclick="Cosmos369.openLetterDetail('${item.id}')">Read Letter</button>` 
+              : `<button class="btn-icon-subtle" onclick="Cosmos369.openLetterDetail('${item.id}')" title="Inspect seal">🔒</button>`
+            }
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function sealLetterToFutureSelf(title, letter, unlockDays) {
+    if (!title || !letter) return;
+    const unlockDate = new Date();
+    unlockDate.setDate(unlockDate.getDate() + parseInt(unlockDays, 10));
+
+    const letters = getVaultLetters();
+    letters.unshift({
+      id: 'vault_' + Date.now(),
+      title: title.trim(),
+      letter: letter.trim(),
+      createdAt: Date.now(),
+      unlockDate: unlockDate.toISOString(),
+      isOpened: false
+    });
+    saveVaultLetters(letters);
+    closeNewLetterModal();
+    renderVault();
+    playSynthTone('singing-bowl', 0.8);
+    showToast('📜 Letter sealed in your sacred vault!');
+  }
+
+  function openNewLetterModal() {
+    const modal = document.getElementById('newLetterModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeNewLetterModal() {
+    const modal = document.getElementById('newLetterModal');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function openLetterDetail(id) {
+    const letters = getVaultLetters();
+    const item = letters.find(l => l.id === id);
+    if (!item) return;
+
+    const isReady = Date.now() >= new Date(item.unlockDate).getTime();
+    if (!isReady) {
+      showToast('🔒 This letter remains sealed in the quantum vault until its appointed date!');
+      return;
+    }
+
+    alert(`📜 LETTER FROM YOUR PAST SELF:\n\nTitle: ${item.title}\nSealed on: ${new Date(item.createdAt).toLocaleDateString()}\n\n"${item.letter}"\n\nTake a deep breath and acknowledge how far you have transformed.`);
+  }
+
+  // ============================================================
+  //  5. SCRIPTING PAGE (Living in the End / Neville Goddard)
+  // ============================================================
+  const SCRIPTING_KEY = 'cosmos_369_scripting_entries';
+
+  const SCRIPTING_PROMPTS = [
+    "I am so grateful and happy now that I wake up every single morning in my dream sanctuary, knowing all my financial desires have fully manifested.",
+    "I still can't believe how easily and effortlessly everything came together. The exact breakthrough I envisioned is now my daily reality.",
+    "My heart is overflowing with gratitude. The deep peace, love, and respect in my relationship feels even better than I dreamed.",
+    "I remember when this used to be just a manifestation on my page. Today, it is my tangible physical reality, and I am in awe of the universe."
+  ];
+  let promptIndex = 0;
+
+  function cycleScriptingPrompt() {
+    promptIndex = (promptIndex + 1) % SCRIPTING_PROMPTS.length;
+    const promptEl = document.getElementById('scriptingPromptText');
+    if (promptEl) promptEl.textContent = `“${SCRIPTING_PROMPTS[promptIndex]}”`;
+  }
+
+  function saveScriptingEntry() {
+    const title = document.getElementById('scriptingTitleInput')?.value || 'Sacred Living in the End';
+    const text = document.getElementById('scriptingTextarea')?.value;
+
+    if (!text || !text.trim()) {
+      showToast('Please write your scripting entry first!');
+      return;
+    }
+
+    const saved = JSON.parse(localStorage.getItem(SCRIPTING_KEY) || '[]');
+    saved.unshift({
+      id: 'script_' + Date.now(),
+      title: title.trim(),
+      body: text.trim(),
+      words: text.trim().split(/\s+/).length,
+      createdAt: new Date().toLocaleDateString()
+    });
+
+    localStorage.setItem(SCRIPTING_KEY, JSON.stringify(saved));
+    document.getElementById('scriptingTextarea').value = '';
+    showToast('✨ Manifestation script anchored into your archives!');
+    renderScripting();
+    playSynthTone('harp', 0.6);
+  }
+
+  function renderScripting() {
+    const container = document.getElementById('scriptingHistoryContainer');
+    if (!container) return;
+
+    const list = JSON.parse(localStorage.getItem(SCRIPTING_KEY) || '[]');
+    if (list.length === 0) {
+      container.innerHTML = `<p style="font-size:13px; color:var(--text-dim); text-align:center; padding:16px;">No saved scripts yet. Write as if your dream has already happened.</p>`;
+      return;
+    }
+
+    container.innerHTML = list.map(item => `
+      <div class="history-item">
+        <div class="history-item-top">
+          <span>${item.title}</span>
+          <span>${item.createdAt} &bull; ${item.words} words</span>
+        </div>
+        <div class="history-item-quote" style="white-space: pre-wrap;">&ldquo;${escapeHtml(item.body)}&rdquo;</div>
+      </div>
+    `).join('');
+  }
+
+  // ============================================================
+  //  6. QUOTES & WISDOM PAGE
+  // ============================================================
+  const WISDOM_QUOTES = [
+    { text: "Assume the feeling of the wish fulfilled and observe the route that your attention follows.", author: "Neville Goddard", cat: "Manifestation" },
+    { text: "If you want to find the secrets of the universe, think in terms of energy, frequency and vibration.", author: "Nikola Tesla", cat: "Energy" },
+    { text: "Nowhere can man find a quieter or more untroubled retreat than in his own soul.", author: "Marcus Aurelius", cat: "Stillness" },
+    { text: "Silence is a source of great strength. In stillness, the universe yields to you.", author: "Lao Tzu", cat: "Stillness" },
+    { text: "You do not attract what you want. You attract what you are.", author: "Dr. Wayne Dyer", cat: "Manifestation" },
+    { text: "Infinite spirit, open the way for my great abundance. Let all that is mine by divine right now reach me.", author: "Florence Scovel Shinn", cat: "Abundance" },
+    { text: "Quiet the mind, and the soul will speak.", author: "Ma Jaya Sati Bhagavati", cat: "Stillness" },
+    { text: "What you seek is seeking you.", author: "Rumi", cat: "Manifestation" }
+  ];
+
+  function renderQuotes(category = 'all') {
+    const container = document.getElementById('quotesListContainer');
+    if (!container) return;
+
+    const filtered = category === 'all' ? WISDOM_QUOTES : WISDOM_QUOTES.filter(q => q.cat.toLowerCase() === category.toLowerCase());
+
+    container.innerHTML = filtered.map(q => `
+      <div class="wisdom-quote-item">
+        <div class="wisdom-quote-body">&ldquo;${escapeHtml(q.text)}&rdquo;</div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:12px; color:var(--gold-400); font-style:italic;">&mdash; ${q.author}</span>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-use-template" style="font-size:11px; padding:5px 12px;" onclick="Cosmos369.adoptQuoteAsAffirmation('${escapeHtml(q.text)}')">
+              Adopt as Affirmation
+            </button>
+            <button class="btn-icon-subtle" onclick="Cosmos369.copyTemplate('${escapeHtml(q.text)}')">📋</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function adoptQuoteAsAffirmation(text) {
+    setActiveAffirmation(text, 'Sacred Wisdom');
+    showToast('Quote adopted as your active 369 affirmation! ✦');
+    switchTab('today');
+  }
 
   // Export to global scope for HTML event handlers
   window.Cosmos369 = {
@@ -1464,6 +2275,53 @@
     dismissActiveAlarm,
     writeNowFromAlarm,
     promptInstallPWA,
+
+    // Vision Board
+    loadVisionBoard,
+    addVisionImage,
+    deleteVisionImage,
+    openLightbox,
+    closeLightbox,
+    zoomIn,
+    zoomOut,
+    resetZoom,
+    nextLightbox,
+    prevLightbox,
+    startSlideshow,
+    stopSlideshow,
+    toggleSlideshowPlay,
+    nextSlide,
+    prevSlide,
+
+    // Techniques
+    renderTechniques,
+    openTechniqueStudio,
+    closeTechniqueStudio,
+    quickFillTechniqueLine,
+    quickFillAllTechniqueLines,
+    completeTechniqueDay,
+
+    // Solfeggio
+    setSolfeggioFreq,
+    toggleSolfeggio,
+    setSolfeggioTimer,
+
+    // Future Vault
+    renderVault,
+    openNewLetterModal,
+    closeNewLetterModal,
+    sealLetterToFutureSelf,
+    openLetterDetail,
+
+    // Scripting
+    cycleScriptingPrompt,
+    saveScriptingEntry,
+    renderScripting,
+
+    // Quotes
+    renderQuotes,
+    adoptQuoteAsAffirmation,
+
     openCustomTemplateModal: () => {
       const text = prompt('Enter your sacred manifestation sentence (e.g. "I am attracting..."):');
       if (text && text.trim()) {

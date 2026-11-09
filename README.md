@@ -21,16 +21,30 @@ A dedicated, offline-first Progressive Web App (PWA) designed to pin like a nati
   * **Upload your own custom alarm tone** (`.mp3`, `.wav`, etc.) — persistently saved in IndexedDB!
   * 5 built-in synthesized sacred tones (528 Hz Solfeggio, Tibetan Singing Bowl, Zen Gong, Celestial Harp, Crystal Bell).
   * In-app pulsing alarm alert with device vibration.
-* **Affirmations Library by Life Aspects**:
-  * 💖 Relationship & Love
-  * 🌸 Self Care & Self Worth
-  * 🚀 Career & Purpose
-  * 💼 Business & Entrepreneurship
-  * 💰 Wealth & Abundance
-  * 🌿 Health & Vitality
-  * 🧘 Inner Peace & Calm
-  * 🌌 Spiritual Alignment
-  * Add and save your own custom affirmations!
+* **Vision Board Sanctuary**:
+  * Upload vision images saved offline in browser storage + curated aesthetic themes.
+  * Interactive Lightbox with **Zoom In (+)**, **Zoom Out (-)**, and **Reset (100%)** controls.
+  * Fullscreen **Slideshow Mode** with auto-advancing slides and ambient 432 Hz harmonics.
+* **Other Sacred Manifestation Rituals**:
+  * **55x5 Manifestation Code**: 55 daily repetitions for 5 days to reprogram subconscious resistance.
+  * **777 Angelic Alignment**: 7 repetitions at sunrise + 7 at bedtime for 7 days.
+  * **44x4 Foundation Ritual**: 44 daily repetitions for 4 days to build unshakable grounded roots.
+  * **33x3 Rapid Breakthrough Spark**: 33 daily repetitions for 3 days for sudden breakthrough momentum.
+* **Continuous Solfeggio Frequencies Generator**:
+  * Pure continuous audio tones: **369 Hz** (Tesla Vortex), **432 Hz** (Cosmic Harmony & Healing), **528 Hz** (DNA & Miracles), **639 Hz** (Soul Connection), and **963 Hz** (Pineal Awakening).
+  * Meditation timer presets: Continuous, 5m, 10m, 15m, 30m.
+  * Resonant visualizer pulse ring.
+* **Future Self Vault**:
+  * Time lock an encrypted letter to your future self (30 days, 90 days, 6 months, 1 year).
+  * Sealed with a quantum wax stamp & countdown timer. Remains sealed until the appointed date arrives.
+* **Scripting Studio (Living in the End)**:
+  * Neville Goddard manifestation framework: assume the wish fulfilled in the present/past tense.
+  * Guided embodiment prompts with 1-click cycle.
+  * Integrated 528 Hz ambient sound toggle and searchable journal archives.
+* **Quotes & Stillness Wisdom**:
+  * Daily Sacred Oracle quote card.
+  * Category filters: Stillness, Manifestation, Energy & Tesla, Abundance.
+  * 1-click **Adopt as Affirmation** button to immediately use any quote in your 369 practice.
 * **Aesthetic Cosmic Experience**:
   * Deep night sky canvas with drifting starlight and golden accents.
   * Sensory chime feedback while typing.

@@ -1381,3 +1381,664 @@ input:checked + .slider:before {
   pointer-events: none;
   z-index: 250;
 }
+
+/* ============================================================
+   NEW MANIFESTATION MODULES STYLING
+   Vision Board, Techniques, Solfeggio, Vault, Scripting, Quotes
+   ============================================================ */
+
+/* Practices Hub Shortcuts Grid on Today View */
+.hub-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 22px 0 12px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gold-200);
+}
+.practices-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.hub-tile-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  color: var(--text-main);
+  text-decoration: none;
+}
+.hub-tile-btn:hover {
+  border-color: var(--gold-400);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.15);
+}
+.hub-tile-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 6px;
+  color: var(--gold-400);
+}
+.hub-tile-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ============================================================
+   1. VISION BOARD & LIGHTBOX ZOOM / SLIDESHOW
+   ============================================================ */
+.vb-actions-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.btn-vb-action {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--gold-300);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-vb-action:hover {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold-400);
+  color: #ffffff;
+}
+.btn-vb-action.primary {
+  background: var(--gold-gradient);
+  color: #0c101c;
+  border: none;
+}
+
+.vb-masonry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.vb-image-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+}
+.vb-image-card:hover {
+  border-color: var(--gold-400);
+  transform: translateY(-2px);
+  box-shadow: var(--card-glow);
+}
+.vb-img-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.vb-image-card:hover .vb-img-thumb {
+  transform: scale(1.04);
+}
+.vb-card-caption-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to top, rgba(7, 10, 20, 0.95) 0%, rgba(7, 10, 20, 0.4) 70%, transparent 100%);
+  padding: 24px 10px 8px 10px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.vb-delete-btn {
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: #ff6b6b;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* Lightbox with Zoom In / Zoom Out */
+.vb-lightbox-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 8, 17, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 350;
+  display: none;
+  flex-direction: column;
+}
+.vb-lightbox-modal.active {
+  display: flex;
+}
+.lb-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  z-index: 10;
+}
+.lb-caption {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  color: #ffffff;
+  font-weight: 500;
+}
+.lb-viewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  touch-action: none;
+}
+.lb-full-img {
+  max-width: 90vw;
+  max-height: 75vh;
+  object-fit: contain;
+  transition: transform 0.15s ease-out;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.lb-bottom-controls {
+  padding: 14px 20px 24px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  z-index: 10;
+}
+.lb-ctrl-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--gold-200);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.lb-ctrl-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--gold-400);
+}
+
+/* Slideshow Mode Overlay */
+.vb-slideshow-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #050811;
+  z-index: 360;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.vb-slideshow-overlay.active {
+  display: flex;
+}
+.ss-image-wrap {
+  width: 100%;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.ss-img {
+  max-width: 92vw;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 50px rgba(0,0,0,0.8), 0 0 30px rgba(212, 175, 55, 0.2);
+  animation: fadeInSlide 0.8s ease-in-out;
+}
+@keyframes fadeInSlide {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+.ss-caption {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  color: #ffffff;
+  margin-top: 16px;
+  text-align: center;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+.ss-controls-bar {
+  position: absolute;
+  bottom: 24px;
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================================
+   2. OTHER MANIFESTATION TECHNIQUES (55x5, 777, 44x4, 33x3)
+   ============================================================ */
+.technique-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.25s ease;
+  box-shadow: var(--card-glow);
+}
+.technique-item-card:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+}
+.technique-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.technique-badge {
+  font-size: 11px;
+  color: var(--gold-300);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+.technique-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.technique-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+.technique-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.technique-days-tracker {
+  display: flex;
+  gap: 6px;
+}
+.tech-day-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+}
+.tech-day-dot.done {
+  background: var(--success);
+  color: #080c18;
+  border-color: var(--success);
+}
+
+/* ============================================================
+   3. SOLFEGGIO FREQUENCIES GENERATOR
+   ============================================================ */
+.solfeggio-hero {
+  background: radial-gradient(circle at center, rgba(30, 43, 78, 0.8) 0%, rgba(15, 22, 41, 0.95) 80%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: var(--card-glow);
+}
+.frequency-pulse-ring {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-400);
+  margin: 0 auto 16px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 75%);
+  transition: all 0.3s;
+}
+.frequency-pulse-ring.playing {
+  animation: solfeggioResonate 1.6s infinite ease-in-out;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+}
+@keyframes solfeggioResonate {
+  0%, 100% { transform: scale(1); border-color: var(--gold-400); }
+  50% { transform: scale(1.08); border-color: #ffffff; box-shadow: 0 0 50px rgba(212, 175, 55, 0.7); }
+}
+.freq-number-display {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+}
+.freq-unit {
+  font-size: 11px;
+  color: var(--gold-300);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.freq-name-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 20px;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+.freq-purpose-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 320px;
+  margin: 0 auto 18px auto;
+}
+
+/* Frequency Preset Buttons Grid */
+.freq-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.freq-btn-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-main);
+}
+.freq-btn-pill:hover {
+  border-color: var(--gold-400);
+}
+.freq-btn-pill.active {
+  border-color: var(--gold-400);
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+}
+.freq-btn-hz {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--gold-300);
+}
+.freq-btn-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Ambient Layers & Meditation Timer */
+.solfeggio-options-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  scrollbar-width: none;
+}
+.solfeggio-option-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.solfeggio-option-pill.active {
+  background: var(--gold-gradient);
+  color: #0c101c;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+/* Master Play/Stop Control */
+.btn-master-play-solfeggio {
+  width: 100%;
+  background: var(--gold-gradient);
+  color: #0c101c;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+  transition: all 0.2s;
+}
+
+/* ============================================================
+   4. FUTURE SELF VAULT (Time-Locked Sealed Letter)
+   ============================================================ */
+.vault-seal-card {
+  background: radial-gradient(circle at top, rgba(30, 43, 78, 0.9) 0%, rgba(15, 22, 41, 0.95) 90%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 22px;
+  box-shadow: var(--card-glow);
+}
+.vault-wax-seal {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #b8860b 0%, #8b0000 70%, #500000 100%);
+  border: 2px solid var(--gold-300);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.35), inset 0 0 10px rgba(0,0,0,0.5);
+  margin: 0 auto 14px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fae4a8;
+  font-size: 26px;
+}
+.vault-letters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.vault-letter-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  transition: all 0.2s;
+}
+.vault-letter-item.is-unlocked {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(15, 22, 41, 0.95) 100%);
+}
+.vault-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.vault-item-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 17px;
+  color: #ffffff;
+  font-weight: 600;
+}
+.vault-countdown-pill {
+  font-size: 11px;
+  color: var(--gold-300);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+/* ============================================================
+   5. SCRIPTING PAGE (Living in the End / Neville Goddard)
+   ============================================================ */
+.scripting-prompt-carousel {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 18px;
+  position: relative;
+}
+.scripting-prompt-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  font-style: italic;
+  color: #ffffff;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+.scripting-input-area {
+  width: 100%;
+  min-height: 220px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  color: #ffffff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.scripting-input-area:focus {
+  border-color: var(--gold-400);
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+/* ============================================================
+   6. QUOTES & WISDOM PAGE
+   ============================================================ */
+.oracle-quote-card {
+  background: linear-gradient(135deg, rgba(25, 36, 66, 0.95) 0%, rgba(12, 17, 34, 0.95) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 22px;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.18);
+}
+.oracle-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--gold-300);
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 14px;
+  font-weight: 700;
+}
+.oracle-quote-text {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 21px;
+  line-height: 1.45;
+  color: #ffffff;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.oracle-author {
+  font-size: 13px;
+  color: var(--gold-400);
+  font-style: italic;
+}
+.quotes-grid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.wisdom-quote-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  transition: all 0.2s;
+}
+.wisdom-quote-item:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  transform: translateY(-2px);
+}
+.wisdom-quote-body {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 16px;
+  color: #ffffff;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
